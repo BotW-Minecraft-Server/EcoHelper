@@ -1,69 +1,45 @@
 package link.botwmcs.samchai.ecohelper.util;
 
-import committee.nova.lighteco.capabilities.impl.Account;
-import link.botwmcs.samchai.ecohelper.EcoHelper;
+import committee.nova.lighteco.util.EcoUtils;
 import link.botwmcs.samchai.ecohelper.config.EcoHelperConfig;
 import net.minecraft.world.entity.player.Player;
 
 import java.math.BigDecimal;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Optional;
 
 public class BalanceUtil {
-    public static BigDecimal getBalance(Player player) {
-        AtomicReference<BigDecimal> balance = new AtomicReference<>(new BigDecimal("0"));
-        player.getCapability(Account.ACCOUNT).ifPresent(a -> {
-            balance.set(a.getBalance());
-        });
-        return balance.get();
+    public static double getBalance(Player player) {
+        Optional<BigDecimal> balance = EcoUtils.getBalance(player);
+        return balance.map(BigDecimal::doubleValue).orElse(0.0);
     }
 
-    public static void setBalance(Player player, BigDecimal value) {
-        player.getCapability(Account.ACCOUNT).ifPresent(a -> {
-            int balance = value.intValue();
-            if (balance <= EcoHelperConfig.CONFIG.min_balance.get()) {
-                balance = EcoHelperConfig.CONFIG.min_balance.get();
-            } else if (balance >= EcoHelperConfig.CONFIG.max_balance.get()) {
-                balance = EcoHelperConfig.CONFIG.max_balance.get();
-            }
-            a.setBalance(new BigDecimal(balance));
-        });
+    public static EcoUtils.EcoActionResult addBalance(Player player, double value) {
+        value = roundDouble(value);
+        return EcoUtils.debt(player, BigDecimal.valueOf(value));
     }
 
-    public static void addBalance(Player player, BigDecimal value) {
-        player.getCapability(Account.ACCOUNT).ifPresent(a -> {
-            int balance = a.getBalance().add(value).intValue();
-            if (balance <= EcoHelperConfig.CONFIG.min_balance.get()) {
-                balance = EcoHelperConfig.CONFIG.min_balance.get();
-            } else if (balance >= EcoHelperConfig.CONFIG.max_balance.get()) {
-                balance = EcoHelperConfig.CONFIG.max_balance.get();
-            }
-            a.setBalance(new BigDecimal(balance));
-        });
+    public static EcoUtils.EcoActionResult removeBalance(Player player, double value) {
+        value = roundDouble(value);
+        return EcoUtils.credit(player, BigDecimal.valueOf(value));
     }
 
-    public static void removeBalance(Player player, BigDecimal value) {
-        player.getCapability(Account.ACCOUNT).ifPresent(a -> {
-            int balance = a.getBalance().subtract(value).intValue();
-            if (balance <= EcoHelperConfig.CONFIG.min_balance.get()) {
-                balance = EcoHelperConfig.CONFIG.min_balance.get();
-            } else if (balance >= EcoHelperConfig.CONFIG.max_balance.get()) {
-                balance = EcoHelperConfig.CONFIG.max_balance.get();
-            }
-            a.setBalance(new BigDecimal(balance));
-        });
+    public static EcoUtils.EcoActionResult setBalance(Player player, double value) {
+        value = roundDouble(value);
+        EcoUtils.EcoActionResult result = removeBalance(player, getBalance(player));
+        if (result != EcoUtils.EcoActionResult.SUCCESS) return result;
+        return addBalance(player, value);
     }
 
-    public static boolean transferBalance(Player from, Player to, BigDecimal value) {
-        if (getBalance(from).compareTo(value) < 0) {
-            return false;
-        }
-        if (getBalance(to).add(value).intValue() >= EcoHelperConfig.CONFIG.max_balance.get()) {
-            int overheadBalance = getBalance(to).add(value).intValue() - EcoHelperConfig.CONFIG.max_balance.get();
-            removeBalance(from, value.subtract(new BigDecimal(overheadBalance)));
-            setBalance(to, new BigDecimal(EcoHelperConfig.CONFIG.max_balance.get()));
-        }
-        removeBalance(from, value);
-        addBalance(to, value);
-        return true;
+    public static EcoUtils.EcoActionResult transferBalance(Player from, Player to, double value) {
+        value = roundDouble(value);
+        EcoUtils.EcoActionResult result = removeBalance(from, value);
+        if (result != EcoUtils.EcoActionResult.SUCCESS) return result;
+        return addBalance(to, value);
     }
+
+    public static double roundDouble(double value) {
+        return Math.round(value * Math.pow(10, EcoHelperConfig.CONFIG.decimal_place.get())) / Math.pow(10, EcoHelperConfig.CONFIG.decimal_place.get());
+    }
+
+
 }

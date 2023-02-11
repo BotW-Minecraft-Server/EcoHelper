@@ -1,11 +1,12 @@
 {
   "commands.ecohelper.get": "Player %s's balance is: %s",
   "commands.ecohelper.get.myself": "Your balance is: %s",
-  "commands.ecohelper.set": "Player %s's balance has been modified to %s",
-  "commands.ecohelper.add": "Player %s's balance has been increased to %s",
-  "commands.ecohelper.remove": "Player %s's balance has been decreased to %s",
-  "commands.ecohelper.pay.fail": "You don't have enough money to pay %s, or you are in debt.",
-  "commands.ecohelper.pay.fail.self": "You can't pay yourself.",
-  "commands.ecohelper.pay.fail.zero": "You can't pay zero money.",
-  "commands.ecohelper.pay.success": "You have paid %s to %s, now you have %s left."
+  "commands.ecohelper.set.success": "Player %s's balance has been modified to %s",
+  "commands.ecohelper.set.fail": "Player %s's balance could not be modified, reason: %s",
+  "commands.ecohelper.add.success": "Player %s's balance has been increased to %s",
+  "commands.ecohelper.add.fail": "Player %s's balance could not be increased, reason: %s",
+  "commands.ecohelper.remove.success": "Player %s's balance has been decreased to %s",
+  "commands.ecohelper.remove.fail": "Player %s's balance could not be decreased, reason: %s",
+  "commands.ecohelper.pay.success": "You have paid %s to %s, now you have %s left.",
+  "commands.ecohelper.pay.fail": "Pay failed, reason: %s"
 }
