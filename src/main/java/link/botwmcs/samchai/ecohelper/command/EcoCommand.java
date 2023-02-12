@@ -2,6 +2,7 @@ package link.botwmcs.samchai.ecohelper.command;
 
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import committee.nova.lighteco.util.EcoUtils;
@@ -10,8 +11,12 @@ import link.botwmcs.samchai.ecohelper.util.BalanceUtil;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ItemLike;
 
 import java.util.function.Predicate;
 
@@ -43,6 +48,8 @@ public class EcoCommand {
                 return false;
             }
         };
+        double minBalance = EcoHelperConfig.CONFIG.min_balance.get();
+        double maxBalance = EcoHelperConfig.CONFIG.max_balance.get();
 
         LiteralCommandNode<CommandSourceStack> register = dispatcher.register(Commands.literal("eco")
                         .requires(isPlayer)
@@ -59,7 +66,7 @@ public class EcoCommand {
                                                 })
                                         )
                                         .then(Commands.literal("set")
-                                                .then(Commands.argument("balance", DoubleArgumentType.doubleArg())
+                                                .then(Commands.argument("balance", DoubleArgumentType.doubleArg(minBalance, maxBalance))
                                                         .executes(context -> {
                                                             ServerPlayer serverPlayer = EntityArgument.getPlayer(context, "target");
                                                             double balance = DoubleArgumentType.getDouble(context, "balance");
@@ -107,7 +114,35 @@ public class EcoCommand {
                                 )
                         )
                         .then(Commands.literal("exchange")
-                                .requires(configToggleGUI.negate()))
+                                .requires(configToggleGUI.negate())
+                                .then(Commands.argument("amount", IntegerArgumentType.integer(1))
+                                        .executes(context -> {
+                                            ServerPlayer player = context.getSource().getPlayerOrException();
+                                            int amount = IntegerArgumentType.getInteger(context, "amount");
+                                            boolean result = BalanceUtil.exchangeToBalance(player, amount);
+                                            if (result) {
+                                                context.getSource().sendSuccess(Component.nullToEmpty("yes"), true);
+                                            } else {
+                                                context.getSource().sendFailure(Component.nullToEmpty("no"));
+                                            }
+
+                                            return 1;
+                                        })
+                                )
+                                .then(Commands.literal("all")
+                                        .executes(context -> {
+                                            ServerPlayer player = context.getSource().getPlayerOrException();
+                                            boolean result = BalanceUtil.exchangeToBalance(player);
+                                            if (result) {
+                                                context.getSource().sendSuccess(Component.nullToEmpty("yes"), true);
+                                            } else {
+                                                context.getSource().sendFailure(Component.nullToEmpty("no"));
+                                            }
+
+                                            return 1;
+                                        })
+                                )
+                        )
                         .then(Commands.literal("pay")
                                 .requires(configToggleGUI.negate())
                                 .then(Commands.argument("target", EntityArgument.player())
