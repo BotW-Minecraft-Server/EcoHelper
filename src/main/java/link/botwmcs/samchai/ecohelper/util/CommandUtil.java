@@ -3,6 +3,7 @@ package link.botwmcs.samchai.ecohelper.util;
 import net.minecraft.CrashReport;
 import net.minecraft.CrashReportCategory;
 import net.minecraft.ReportedException;
+import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -18,39 +19,47 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
+import java.util.UUID;
 
 public class CommandUtil {
-    public static String rawCommandBlock(ServerLevel serverLevel, Vec3 vec3, String command) {
-        BaseCommandBlock commandBlock = new BaseCommandBlock() {
+    public static String runCommand(ServerLevel serverLevel, Vec3 vec3, String command) {
+        StringBuilder output = new StringBuilder();
+        CommandSource source = new CommandSource() {
             @Override
-            public @NotNull ServerLevel getLevel() {
-                return serverLevel;
-            }
-
-            @Override
-            public void onUpdated() {
-
+            public void sendMessage(Component pComponent, @NotNull UUID pSenderUUID) {
+                output.append(pComponent.getString());
             }
 
             @Override
-            public @NotNull Vec3 getPosition() {
-                return vec3;
+            public boolean acceptsSuccess() {
+                return true;
             }
 
             @Override
-            public @NotNull CommandSourceStack createCommandSourceStack() {
-                return new CommandSourceStack(this, vec3, Vec2.ZERO, serverLevel, 2, "CommandBlock", Component.nullToEmpty("CommandBlock"), serverLevel.getServer(), null);
+            public boolean acceptsFailure() {
+                return true;
             }
 
-            public void setCommand(@NotNull String command) {
-                super.setCommand(command);
+            @Override
+            public boolean shouldInformAdmins() {
+                return false;
             }
-
-
         };
-        commandBlock.setCommand(command);
-        commandBlock.performCommand(serverLevel);
-        return commandBlock.getLastOutput().getString();
+        serverLevel.getServer().getCommands().performCommand(
+            new CommandSourceStack(
+                source,
+                vec3,
+                Vec2.ZERO,
+                serverLevel,
+                2,
+                "dev",
+                Component.nullToEmpty("dev"),
+                serverLevel.getServer(),
+                null
+            ),
+            command
+        );
+        return output.toString();
     }
 
 
@@ -125,7 +134,7 @@ public class CommandUtil {
 //    }
 //
     public static String runCommand(ServerLevel serverLevel, BlockPos nearPos, String command) {
-        return rawCommandBlock(serverLevel, Vec3.atBottomCenterOf(nearPos), command);
+        return runCommand(serverLevel, Vec3.atBottomCenterOf(nearPos), command);
     }
 
     public static String runCommandOnPlayerPos(ServerLevel serverLevel, ServerPlayer serverPlayer, String command) {

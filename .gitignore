@@ -1,6 +1,7 @@
 # User-specific stuff
 .idea/
-
+!libs/lighteco-1.0.0.jar
+x
 *.iml
 *.ipr
 *.iws
