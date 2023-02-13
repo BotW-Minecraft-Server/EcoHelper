@@ -3,10 +3,13 @@ package link.botwmcs.samchai.ecohelper.command;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.DoubleArgumentType;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import committee.nova.lighteco.util.EcoUtils;
+import link.botwmcs.samchai.ecohelper.EcoHelper;
 import link.botwmcs.samchai.ecohelper.config.EcoHelperConfig;
+import link.botwmcs.samchai.ecohelper.impl.BukkitImpl;
 import link.botwmcs.samchai.ecohelper.util.BalanceUtil;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -14,9 +17,6 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
-import net.minecraft.world.level.ItemLike;
 
 import java.util.function.Predicate;
 
@@ -162,13 +162,25 @@ public class EcoCommand {
                                                                 })
                                                 )
                                 ))
-                        .then(Commands.literal("open")
+                        .then(Commands.literal("bukkit")
+                                .then(Commands.argument("command", StringArgumentType.greedyString())
+                                        .executes(context -> {
+                                            ServerPlayer player = context.getSource().getPlayerOrException();
+                                            String command = StringArgumentType.getString(context, "command");
+                                            String output = BukkitImpl.getPlayerBukkitEco(player, command);
+                                            context.getSource().sendSuccess(Component.nullToEmpty(output), true);
+                                            return 1;
+                                        })
+                                )
+                        )
+                        .then(Commands.literal("wallet")
                                 .requires(configToggleGUI)
                                 .executes(context -> {
                                     ServerPlayer player = context.getSource().getPlayerOrException();
                                     return 1;
                                 })
                         )
+
         );
     }
 }
