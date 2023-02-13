@@ -1,9 +1,13 @@
 package link.botwmcs.samchai.ecohelper;
 
 import com.mojang.logging.LogUtils;
+import committee.nova.lighteco.util.EcoUtils;
 import link.botwmcs.samchai.ecohelper.command.EcoCommand;
 import link.botwmcs.samchai.ecohelper.config.EcoHelperConfig;
+import link.botwmcs.samchai.ecohelper.util.BalanceUtil;
+import link.botwmcs.samchai.ecohelper.util.PlayerUtil;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.slf4j.Logger;
@@ -15,6 +19,7 @@ public class EcoHelper {
 
     // Directly reference a slf4j logger
     public static final Logger LOGGER = LogUtils.getLogger();
+    public static final String MODID = "ecohelper";
 
     public EcoHelper() {
         // Register config
@@ -24,6 +29,18 @@ public class EcoHelper {
     @SubscribeEvent
     public static void registerCommand(RegisterCommandsEvent event) {
         new EcoCommand(event.getDispatcher());
+    }
+
+    @SubscribeEvent
+    public static void onPlayerJoinedServer(PlayerEvent.PlayerLoggedInEvent event) {
+        if (PlayerUtil.isJoiningWorldForTheFirstTime(event.getPlayer())) {
+            EcoUtils.EcoActionResult result = BalanceUtil.addBalance(event.getPlayer(), EcoHelperConfig.CONFIG.default_balance.get());
+            if (result != EcoUtils.EcoActionResult.SUCCESS) {
+                EcoHelper.LOGGER.warn("Failed to add first join default balance to player " + event.getPlayer().getName().getString());
+            } else {
+                EcoHelper.LOGGER.info("Added first join default balance to player " + event.getPlayer().getName().getString());
+            }
+        }
     }
 
 //    private void setup(final FMLCommonSetupEvent event) {

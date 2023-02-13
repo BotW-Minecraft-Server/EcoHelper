@@ -161,16 +161,6 @@ public class EcoCommand {
                                                                     return 1;
                                                                 })
                                                 )
-                                ))
-                        .then(Commands.literal("bukkit")
-                                .then(Commands.argument("command", StringArgumentType.greedyString())
-                                        .executes(context -> {
-                                            ServerPlayer player = context.getSource().getPlayerOrException();
-                                            String command = StringArgumentType.getString(context, "command");
-                                            String output = BukkitImpl.getPlayerBukkitEco(player, command);
-                                            context.getSource().sendSuccess(Component.nullToEmpty(output), true);
-                                            return 1;
-                                        })
                                 )
                         )
                         .then(Commands.literal("wallet")
