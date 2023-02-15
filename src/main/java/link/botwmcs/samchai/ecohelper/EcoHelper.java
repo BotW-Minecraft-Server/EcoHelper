@@ -4,8 +4,11 @@ import com.mojang.logging.LogUtils;
 import committee.nova.lighteco.util.EcoUtils;
 import link.botwmcs.samchai.ecohelper.command.EcoCommand;
 import link.botwmcs.samchai.ecohelper.config.EcoHelperConfig;
+import link.botwmcs.samchai.ecohelper.item.TradableItemsManager;
 import link.botwmcs.samchai.ecohelper.util.BalanceUtil;
 import link.botwmcs.samchai.ecohelper.util.PlayerUtil;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -33,14 +36,24 @@ public class EcoHelper {
 
     @SubscribeEvent
     public static void onPlayerJoinedServer(PlayerEvent.PlayerLoggedInEvent event) {
+
         if (PlayerUtil.isJoiningWorldForTheFirstTime(event.getPlayer())) {
-            EcoUtils.EcoActionResult result = BalanceUtil.addBalance(event.getPlayer(), EcoHelperConfig.CONFIG.default_balance.get());
-            if (result != EcoUtils.EcoActionResult.SUCCESS) {
-                EcoHelper.LOGGER.warn("Failed to add first join default balance to player " + event.getPlayer().getName().getString());
+            if (EcoHelperConfig.CONFIG.default_balance.get() == 0) {
+                return;
             } else {
-                EcoHelper.LOGGER.info("Added first join default balance to player " + event.getPlayer().getName().getString());
+                EcoUtils.EcoActionResult result = BalanceUtil.setBalance(event.getPlayer(), EcoHelperConfig.CONFIG.default_balance.get());
+                if (result != EcoUtils.EcoActionResult.SUCCESS) {
+                    EcoHelper.LOGGER.warn("Failed to add first join default balance to player " + event.getPlayer().getName().getString() + ", reason: " + result);
+                } else {
+                    EcoHelper.LOGGER.info("Added first join default balance to player " + event.getPlayer().getName().getString());
+                }
             }
         }
+    }
+
+    public static ResourceLocation resourceLocation(String path) {
+
+        return new ResourceLocation(MODID, path);
     }
 
 //    private void setup(final FMLCommonSetupEvent event) {

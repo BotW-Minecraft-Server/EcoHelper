@@ -10,6 +10,8 @@ import committee.nova.lighteco.util.EcoUtils;
 import link.botwmcs.samchai.ecohelper.EcoHelper;
 import link.botwmcs.samchai.ecohelper.config.EcoHelperConfig;
 import link.botwmcs.samchai.ecohelper.impl.BukkitImpl;
+import link.botwmcs.samchai.ecohelper.item.TradableItems;
+import link.botwmcs.samchai.ecohelper.item.TradableItemsManager;
 import link.botwmcs.samchai.ecohelper.util.BalanceUtil;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -17,6 +19,8 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
 
 import java.util.function.Predicate;
 
@@ -162,6 +166,19 @@ public class EcoCommand {
                                                                 })
                                                 )
                                 )
+                        )
+                        .then(Commands.literal("price")
+                                .executes(context -> {
+                                    ServerPlayer player = context.getSource().getPlayerOrException();
+                                    ItemStack itemOnHand = player.getItemInHand(InteractionHand.MAIN_HAND);
+                                    EcoHelper.LOGGER.info(itemOnHand.toString());
+                                    TradableItems items = TradableItemsManager.get(itemOnHand);
+                                    assert items != null;
+                                    double price = items.worth();
+                                    String priceString = String.format("%.2f", price);
+                                    context.getSource().sendSuccess(Component.nullToEmpty(priceString), true);
+                                    return 1;
+                                })
                         )
                         .then(Commands.literal("wallet")
                                 .requires(configToggleGUI)

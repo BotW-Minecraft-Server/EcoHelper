@@ -10,6 +10,7 @@ import net.minecraft.world.level.Level;
 import java.util.Set;
 
 public class PlayerUtil {
+    // code: https://github.com/ricksouth/serilum-mc-mod-sources/blob/45efc681b341a579b812c44d5576f23f8273eb76/sources/Collective/1.18.2/Common/src/main/java/com/natamus/collective/functions/PlayerFunctions.java#L86
     public static boolean isJoiningWorldForTheFirstTime(Player player, boolean mustHaveEmptyInventory) {
         String firstjointag = EcoHelper.MODID + ".firstJoin";
 

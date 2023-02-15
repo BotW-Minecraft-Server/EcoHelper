@@ -1,6 +1,5 @@
 package link.botwmcs.samchai.ecohelper.config;
 
-
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
