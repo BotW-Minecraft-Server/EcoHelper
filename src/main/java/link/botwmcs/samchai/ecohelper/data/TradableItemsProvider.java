@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import link.botwmcs.samchai.ecohelper.EcoHelper;
 import link.botwmcs.samchai.ecohelper.config.EcoHelperConfig;
-import link.botwmcs.samchai.ecohelper.data.integration.Integration;
 import link.botwmcs.samchai.ecohelper.item.TradableItems;
 import link.botwmcs.samchai.ecohelper.item.TradableItemsManager;
 import net.minecraft.data.DataGenerator;
@@ -22,6 +21,9 @@ public class TradableItemsProvider implements DataProvider {
     private final Map<ResourceLocation, TradableItems> TRADABLE_ITEMS = new HashMap<>();
     private final DataGenerator dataGenerator;
     private final String modid;
+    public static ResourceLocation mcLoc(String path) {
+        return new ResourceLocation("minecraft", path);
+    }
 
     public TradableItemsProvider(DataGenerator dataGenerator, String modid) {
         this.dataGenerator = dataGenerator;
@@ -32,7 +34,7 @@ public class TradableItemsProvider implements DataProvider {
         // Default from config
         String location = EcoHelperConfig.CONFIG.default_balance_unit.get();
         double value = EcoHelperConfig.CONFIG.default_balance_unit_worth.get();
-        add(Integration.mcLoc(location), value);
+        add(mcLoc(location), value);
 
     }
 

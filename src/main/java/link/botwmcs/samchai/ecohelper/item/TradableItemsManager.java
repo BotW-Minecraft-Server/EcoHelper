@@ -59,6 +59,7 @@ public class TradableItemsManager extends SimpleJsonResourceReloadListener {
 
     @SubscribeEvent
     public static void onResourceReload(AddReloadListenerEvent event) {
+        EcoHelper.LOGGER.info("Datapack enabled!");
         event.addListener(INSTANCE = new TradableItemsManager());
     }
 

@@ -15,7 +15,7 @@ public class DataGenerators {
     public static void gatherData(GatherDataEvent event) {
         DataGenerator generator = event.getGenerator();
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
-
+        EcoHelper.LOGGER.info("Gather Datapack!");
         generator.addProvider(new TradableItemsProvider(generator, EcoHelper.MODID));
 
     }
