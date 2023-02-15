@@ -21,8 +21,9 @@ public class TradableItemsProvider implements DataProvider {
     private final Map<ResourceLocation, TradableItems> TRADABLE_ITEMS = new HashMap<>();
     private final DataGenerator dataGenerator;
     private final String modid;
-    public static ResourceLocation mcLoc(String path) {
-        return new ResourceLocation("minecraft", path);
+    public static ResourceLocation location(String path) {
+//        return new ResourceLocation("minecraft", path);
+        return new ResourceLocation(path);
     }
 
     public TradableItemsProvider(DataGenerator dataGenerator, String modid) {
@@ -34,7 +35,7 @@ public class TradableItemsProvider implements DataProvider {
         // Default from config
         String location = EcoHelperConfig.CONFIG.default_balance_unit.get();
         double value = EcoHelperConfig.CONFIG.default_balance_unit_worth.get();
-        add(mcLoc(location), value);
+        add(location(location), value);
 
     }
 

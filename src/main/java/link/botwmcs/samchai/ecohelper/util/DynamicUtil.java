@@ -29,15 +29,6 @@ public class DynamicUtil {
         }
     }
 
-    public static ItemStack getBalanceUnitItemStack() {
-        Item item = getBalanceUnitItem();
-        return new ItemStack(item);
-    }
-
-    public static void setBalanceUnitItemWorth(double worth) {
-        EcoHelperConfig.CONFIG.default_balance_unit_worth.set(worth);
-    }
-
     public static double getDynamicSellingPrice(double currentPrice, double playerBalance) {
         return priceDownByProperty(currentPrice, playerBalance, EcoHelperConfig.CONFIG.dynamic_economic_basic_property.get());
     }
