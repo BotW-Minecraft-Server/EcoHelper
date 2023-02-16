@@ -16,6 +16,7 @@ public class EcoHelperConfig {
 
     public final ForgeConfigSpec.BooleanValue enabled;
     public final ForgeConfigSpec.BooleanValue enable_gui;
+    public final ForgeConfigSpec.BooleanValue enable_item_tooltip;
     public final ForgeConfigSpec.ConfigValue<String> economy_sync_mode;
     public final ForgeConfigSpec.ConfigValue<String> bukkit_economy_system;
     public final ForgeConfigSpec.ConfigValue<String> get_bukkit_economy_command;
@@ -50,6 +51,9 @@ public class EcoHelperConfig {
         enable_gui = builder
                 .comment("Enable player's balance GUI")
                 .define("enable_gui", true);
+        enable_item_tooltip = builder
+                .comment("Enable tradable item worth tooltip display")
+                .define("enable_item_tooltip", true);
         economy_sync_mode = builder
                 .comment("Economy sync mode (initiative, passive, set false to disable sync)")
                 .define("economy_mode", "passive");
