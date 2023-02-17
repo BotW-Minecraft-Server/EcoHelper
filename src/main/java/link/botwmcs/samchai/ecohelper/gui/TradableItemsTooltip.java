@@ -5,8 +5,6 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Either;
 import com.mojang.math.Matrix4f;
 import link.botwmcs.samchai.ecohelper.EcoHelper;
-import link.botwmcs.samchai.ecohelper.item.TradableItems;
-import link.botwmcs.samchai.ecohelper.item.TradableItemsManager;
 import link.botwmcs.samchai.ecohelper.util.BalanceUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -15,7 +13,6 @@ import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.network.protocol.game.ClientboundMoveEntityPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
@@ -37,7 +34,6 @@ public class TradableItemsTooltip {
         ItemStack itemStack = event.getItemStack();
         if (minecraft.level != null) {
             double worth = BalanceUtil.tradableItemWorth(minecraft.level, itemStack);
-            EcoHelper.LOGGER.info("worth: " + worth);
             if (worth != 0) {
                 event.getTooltipElements().add(x, Either.right(new WorthComponent(itemStack)));
             }

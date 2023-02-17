@@ -119,7 +119,6 @@ public class TradableItemRecipe implements Recipe<Inventory> {
             if (recipe.getIngredient().test(itemStack)) {
                 recipeList.add(recipe);
                 if (recipe.getWorth() != 0) {
-                    EcoHelper.LOGGER.info("Recipe: " + recipe);
                     return recipe;
                 }
             }
