@@ -2,12 +2,18 @@ package link.botwmcs.samchai.ecohelper.util;
 
 import committee.nova.lighteco.util.EcoUtils;
 import link.botwmcs.samchai.ecohelper.config.EcoHelperConfig;
+import link.botwmcs.samchai.ecohelper.item.TradableItems;
+import link.botwmcs.samchai.ecohelper.item.TradableItemsManager;
+import link.botwmcs.samchai.ecohelper.recipe.TradableItemRecipe;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.network.PacketDistributor;
 
 import java.math.BigDecimal;
 import java.util.Optional;
@@ -84,6 +90,15 @@ public class BalanceUtil {
         } else {
             return exchangeToBalance(player, total);
         }
+    }
+
+    public static double tradableItemWorth(Level level, ItemStack itemStack) {
+        double worth = 0;
+        TradableItemRecipe recipe = TradableItemRecipe.getRecipeFromItem(level, itemStack);
+        if (recipe != null) {
+            worth = recipe.getWorth();
+        }
+        return worth;
     }
 
     public static double roundDouble(double value) {

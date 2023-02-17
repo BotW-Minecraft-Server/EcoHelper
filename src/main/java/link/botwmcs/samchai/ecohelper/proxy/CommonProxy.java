@@ -6,14 +6,19 @@ import link.botwmcs.samchai.ecohelper.command.EcoCommand;
 import link.botwmcs.samchai.ecohelper.config.EcoHelperConfig;
 import link.botwmcs.samchai.ecohelper.item.TradableItems;
 import link.botwmcs.samchai.ecohelper.item.TradableItemsManager;
+import link.botwmcs.samchai.ecohelper.recipe.ModRecipes;
+import link.botwmcs.samchai.ecohelper.recipe.TradableItemRecipe;
 import link.botwmcs.samchai.ecohelper.util.BalanceUtil;
 import link.botwmcs.samchai.ecohelper.util.PlayerUtil;
 import net.minecraft.commands.Commands;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.RegisterCommandsEvent;
+import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.server.ServerStartedEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -34,6 +39,7 @@ public class CommonProxy {
         IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
         EcoHelperConfig.init();
         registerListeners(bus);
+        ModRecipes.register(bus);
     }
 
     public void registerListeners(IEventBus bus) {}
@@ -41,6 +47,11 @@ public class CommonProxy {
     @SubscribeEvent
     public static void registerCommand(RegisterCommandsEvent event) {
         new EcoCommand(event.getDispatcher());
+    }
+
+    @SubscribeEvent
+    public static void registerRecipeTypes(final RegistryEvent.Register<RecipeSerializer<?>> event) {
+        Registry.register(Registry.RECIPE_TYPE, TradableItemRecipe.Type.ID, TradableItemRecipe.Type.INSTANCE);
     }
 
     @SubscribeEvent

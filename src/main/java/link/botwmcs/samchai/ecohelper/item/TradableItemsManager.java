@@ -33,6 +33,7 @@ public class TradableItemsManager extends SimpleJsonResourceReloadListener {
 
     public static TradableItems get(ItemStack itemStack) {
         ResourceLocation location = Registry.ITEM.getKey(itemStack.getItem());
+//        EcoHelper.LOGGER.info(String.valueOf(location));
         TradableItems economyItem = ITEMS.get(location);
 
         if (economyItem != null) {

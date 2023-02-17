@@ -7,9 +7,9 @@ import com.mojang.math.Matrix4f;
 import link.botwmcs.samchai.ecohelper.EcoHelper;
 import link.botwmcs.samchai.ecohelper.item.TradableItems;
 import link.botwmcs.samchai.ecohelper.item.TradableItemsManager;
+import link.botwmcs.samchai.ecohelper.util.BalanceUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.renderer.GameRenderer;
@@ -36,8 +36,9 @@ public class TradableItemsTooltip {
         Minecraft minecraft = Minecraft.getInstance();
         ItemStack itemStack = event.getItemStack();
         if (minecraft.level != null) {
-            TradableItems item = TradableItemsManager.get(itemStack);
-            if (item != null) {
+            double worth = BalanceUtil.tradableItemWorth(minecraft.level, itemStack);
+            EcoHelper.LOGGER.info("worth: " + worth);
+            if (worth != 0) {
                 event.getTooltipElements().add(x, Either.right(new WorthComponent(itemStack)));
             }
         }
@@ -47,29 +48,24 @@ public class TradableItemsTooltip {
     public record WorthComponent(ItemStack stack) implements ClientTooltipComponent, TooltipComponent {
         @Override
         public void renderImage(@NotNull Font font, int tooltipX, int tooltipY, @Nonnull PoseStack pose, @NotNull ItemRenderer itemRenderer, int something) {
-            pose.pushPose();
             RenderSystem.setShader(GameRenderer::getPositionTexShader);
             RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             RenderSystem.setShaderTexture(0, MONEY_ICON);
-
-            pose.translate(tooltipX - 1, tooltipY - 1, 0);
-//            pose.scale(0.5f, 0.5f, 1f);
+            pose.pushPose();
+            pose.translate(tooltipX - 1, tooltipY - 1, 100);
+            pose.scale(0.5f, 0.5f, 1f);
             RenderSystem.enableBlend();
-            GuiComponent.blit(pose, 0, 0, 0, 0, 8, 8, 8, 8);
-
-            font.draw(pose, "100", tooltipX + 12, tooltipY, -1);
+            GuiComponent.blit(pose, 0, 0, 0, 0, 16, 16, 16, 16);
             pose.popPose();
-
         }
         @Override
         public void renderText(@NotNull Font font, int tooltipX, int tooltipY, @NotNull Matrix4f matrix4f, MultiBufferSource.@NotNull BufferSource bufferSource) {
             Minecraft mc = Minecraft.getInstance();
-            double worth = TradableItemsManager.get(stack).worth() * stack.getCount();
+            double worth = BalanceUtil.tradableItemWorth(mc.level, stack);
             String text = "x" + worth;
             Color textColor = Color.decode("#A8A8A8");
             mc.font.drawInBatch(text, tooltipX + 10, tooltipY - 1, textColor.getRGB(), true, matrix4f, bufferSource, false, 0, 15728880);
         }
-
         @Override
         public int getHeight() {
             return 8;

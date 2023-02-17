@@ -12,6 +12,7 @@ import link.botwmcs.samchai.ecohelper.config.EcoHelperConfig;
 import link.botwmcs.samchai.ecohelper.impl.BukkitImpl;
 import link.botwmcs.samchai.ecohelper.item.TradableItems;
 import link.botwmcs.samchai.ecohelper.item.TradableItemsManager;
+import link.botwmcs.samchai.ecohelper.recipe.TradableItemRecipe;
 import link.botwmcs.samchai.ecohelper.util.BalanceUtil;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -171,12 +172,8 @@ public class EcoCommand {
                                 .executes(context -> {
                                     ServerPlayer player = context.getSource().getPlayerOrException();
                                     ItemStack itemOnHand = player.getItemInHand(InteractionHand.MAIN_HAND);
-                                    EcoHelper.LOGGER.info(itemOnHand.toString());
-                                    TradableItems items = TradableItemsManager.get(itemOnHand);
-                                    assert items != null;
-                                    double price = items.worth();
-                                    String priceString = String.format("%.2f", price);
-                                    context.getSource().sendSuccess(Component.nullToEmpty(priceString), true);
+                                    double worth = BalanceUtil.tradableItemWorth(player.getLevel(), itemOnHand);
+                                    context.getSource().sendSuccess(Component.nullToEmpty(String.valueOf(worth)), true);
                                     return 1;
                                 })
                         )
