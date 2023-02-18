@@ -8,6 +8,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.Level;
 
 import java.math.BigDecimal;
@@ -87,7 +88,7 @@ public class BalanceUtil {
         }
     }
 
-    public static double tradableItemWorth(Level level, ItemStack itemStack) {
+    public static double getTradableItemWorth(Level level, ItemStack itemStack) {
         double worth = 0;
         TradableItemRecipe recipe = TradableItemRecipe.getRecipeFromItem(level, itemStack);
         if (recipe != null) {
@@ -95,6 +96,7 @@ public class BalanceUtil {
         }
         return worth;
     }
+
 
     public static double roundDouble(double value) {
         return Math.round(value * Math.pow(10, EcoHelperConfig.CONFIG.decimal_place.get())) / Math.pow(10, EcoHelperConfig.CONFIG.decimal_place.get());

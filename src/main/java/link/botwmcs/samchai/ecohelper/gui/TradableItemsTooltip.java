@@ -33,7 +33,7 @@ public class TradableItemsTooltip {
         Minecraft minecraft = Minecraft.getInstance();
         ItemStack itemStack = event.getItemStack();
         if (minecraft.level != null) {
-            double worth = BalanceUtil.tradableItemWorth(minecraft.level, itemStack);
+            double worth = BalanceUtil.getTradableItemWorth(minecraft.level, itemStack);
             if (worth != 0) {
                 event.getTooltipElements().add(x, Either.right(new WorthComponent(itemStack)));
             }
@@ -57,7 +57,7 @@ public class TradableItemsTooltip {
         @Override
         public void renderText(@NotNull Font font, int tooltipX, int tooltipY, @NotNull Matrix4f matrix4f, MultiBufferSource.@NotNull BufferSource bufferSource) {
             Minecraft mc = Minecraft.getInstance();
-            double worth = BalanceUtil.tradableItemWorth(mc.level, stack);
+            double worth = BalanceUtil.getTradableItemWorth(mc.level, stack);
             String text = "x" + worth;
             Color textColor = Color.decode("#A8A8A8");
             mc.font.drawInBatch(text, tooltipX + 10, tooltipY - 1, textColor.getRGB(), true, matrix4f, bufferSource, false, 0, 15728880);

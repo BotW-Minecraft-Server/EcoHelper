@@ -162,12 +162,16 @@ public class EcoCommand {
                                                 )
                                 )
                         )
-                        .then(Commands.literal("price")
+                        .then(Commands.literal("worth")
                                 .executes(context -> {
                                     ServerPlayer player = context.getSource().getPlayerOrException();
                                     ItemStack itemOnHand = player.getItemInHand(InteractionHand.MAIN_HAND);
-                                    double worth = BalanceUtil.tradableItemWorth(player.getLevel(), itemOnHand);
-                                    context.getSource().sendSuccess(Component.nullToEmpty(String.valueOf(worth)), true);
+                                    double worth = BalanceUtil.getTradableItemWorth(player.getLevel(), itemOnHand);
+                                    if (worth == 0) {
+                                        context.getSource().sendFailure(new TranslatableComponent("commands.ecohelper.worth.fail"));
+                                    } else {
+                                        context.getSource().sendSuccess(new TranslatableComponent("commands.ecohelper.worth.success", itemOnHand.getHoverName(), worth), true);
+                                    }
                                     return 1;
                                 })
                         )

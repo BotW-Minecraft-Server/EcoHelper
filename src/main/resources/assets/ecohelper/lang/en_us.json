@@ -8,5 +8,7 @@
   "commands.ecohelper.remove.success": "Player %s's balance has been decreased to %s",
   "commands.ecohelper.remove.fail": "Player %s's balance could not be decreased, reason: %s",
   "commands.ecohelper.pay.success": "You have paid %s to %s, now you have %s left.",
-  "commands.ecohelper.pay.fail": "Pay failed, reason: %s"
+  "commands.ecohelper.pay.fail": "Pay failed, reason: %s",
+  "commands.ecohelper.worth.success": "The worth of %s is %s",
+  "commands.ecohelper.worth.fail": "No worth set for this item."
 }

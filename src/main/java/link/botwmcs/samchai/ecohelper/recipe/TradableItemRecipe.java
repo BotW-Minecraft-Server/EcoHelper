@@ -111,6 +111,7 @@ public class TradableItemRecipe implements Recipe<Inventory> {
             pRecipe.getIngredient().toNetwork(pBuffer);
             pBuffer.writeDouble(pRecipe.getWorth());
         }
+
     }
 
     public static TradableItemRecipe getRecipeFromItem(Level level, ItemStack itemStack) {
