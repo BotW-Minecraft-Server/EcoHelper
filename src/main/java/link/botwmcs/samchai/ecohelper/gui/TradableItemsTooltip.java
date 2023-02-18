@@ -5,6 +5,10 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Either;
 import com.mojang.math.Matrix4f;
 import link.botwmcs.samchai.ecohelper.EcoHelper;
+import link.botwmcs.samchai.ecohelper.config.EcoHelperConfig;
+import link.botwmcs.samchai.ecohelper.network.ModNetwork;
+import link.botwmcs.samchai.ecohelper.network.packet.ItemWorthAfterTaxC2SPacket;
+import link.botwmcs.samchai.ecohelper.network.packet.ItemWorthAfterTaxS2CPacket;
 import link.botwmcs.samchai.ecohelper.util.BalanceUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -27,6 +31,8 @@ import java.awt.*;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = EcoHelper.MODID)
 public class TradableItemsTooltip {
+
+
     @SubscribeEvent
     public static void onRenderTooltipEvent(RenderTooltipEvent.GatherComponents event) {
         int x = 1;
@@ -40,6 +46,7 @@ public class TradableItemsTooltip {
         }
     }
     public final static ResourceLocation MONEY_ICON = new ResourceLocation(EcoHelper.MODID, "textures/gui/gold_coin.png");
+    public static double itemWorthAfterTaxFromServer;
 
     public record WorthComponent(ItemStack stack) implements ClientTooltipComponent, TooltipComponent {
         @Override
@@ -58,9 +65,19 @@ public class TradableItemsTooltip {
         public void renderText(@NotNull Font font, int tooltipX, int tooltipY, @NotNull Matrix4f matrix4f, MultiBufferSource.@NotNull BufferSource bufferSource) {
             Minecraft mc = Minecraft.getInstance();
             double worth = BalanceUtil.getTradableItemWorth(mc.level, stack);
-            String text = "x" + worth;
-            Color textColor = Color.decode("#A8A8A8");
-            mc.font.drawInBatch(text, tooltipX + 10, tooltipY - 1, textColor.getRGB(), true, matrix4f, bufferSource, false, 0, 15728880);
+            if (!EcoHelperConfig.CONFIG.dynamic_economic.get()) {
+                Color textColor = Color.decode("#A8A8A8");
+                String text = "x" + worth;
+                mc.font.drawInBatch(text, tooltipX + 10, tooltipY - 1, textColor.getRGB(), true, matrix4f, bufferSource, false, 0, 15728880);
+            } else {
+                ModNetwork.sendToServer(new ItemWorthAfterTaxC2SPacket(worth));
+
+                String text = "§7x§m" + worth + "§r " + itemWorthAfterTaxFromServer;
+//                EcoHelper.LOGGER.info(String.valueOf(ItemWorthAfterTaxS2CPacket.recievedBalance));
+//                EcoHelper.LOGGER.info(String.valueOf(itemWorthAfterTaxFromServer));
+                mc.font.drawInBatch(text, tooltipX + 10, tooltipY - 1, -1, true, matrix4f, bufferSource, false, 0, 15728880);
+            }
+
         }
         @Override
         public int getHeight() {

@@ -4,6 +4,7 @@ import committee.nova.lighteco.util.EcoUtils;
 import link.botwmcs.samchai.ecohelper.EcoHelper;
 import link.botwmcs.samchai.ecohelper.command.EcoCommand;
 import link.botwmcs.samchai.ecohelper.config.EcoHelperConfig;
+import link.botwmcs.samchai.ecohelper.network.ModNetwork;
 import link.botwmcs.samchai.ecohelper.recipe.ModRecipes;
 import link.botwmcs.samchai.ecohelper.recipe.TradableItemRecipe;
 import link.botwmcs.samchai.ecohelper.util.BalanceUtil;
@@ -35,6 +36,7 @@ public class CommonProxy {
         EcoHelperConfig.init();
         registerListeners(bus);
         ModRecipes.register(bus);
+        ModNetwork.register();
     }
 
     public void registerListeners(IEventBus bus) {}
@@ -48,7 +50,6 @@ public class CommonProxy {
     public static void registerRecipeTypes(final RegistryEvent.Register<RecipeSerializer<?>> event) {
         Registry.register(Registry.RECIPE_TYPE, TradableItemRecipe.Type.ID, TradableItemRecipe.Type.INSTANCE);
     }
-
 
     @SubscribeEvent
     public static void onPlayerJoinedServer(PlayerEvent.PlayerLoggedInEvent event) {

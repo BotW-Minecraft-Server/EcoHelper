@@ -110,6 +110,25 @@ public class EcoCommand {
                                                         })
                                                 )
                                         )
+                                        .then(Commands.literal("tax")
+                                                .then(Commands.literal("get")
+                                                        .executes(context -> {
+                                                            return 1;
+                                                        })
+                                                )
+                                                .then(Commands.literal("set")
+                                                        .executes(context -> {
+                                                            return 1;
+                                                        })
+                                                )
+                                                .then(Commands.literal("receiver")
+                                                        .then(Commands.argument("receiver", EntityArgument.player())
+                                                                .executes(context -> {
+                                                                    return 1;
+                                                                })
+                                                        )
+                                                )
+                                        )
                                 )
                         )
                         .then(Commands.literal("exchange")
@@ -120,9 +139,10 @@ public class EcoCommand {
                                             int amount = IntegerArgumentType.getInteger(context, "amount");
                                             boolean result = BalanceUtil.exchangeToBalance(player, amount);
                                             if (result) {
-                                                context.getSource().sendSuccess(Component.nullToEmpty("yes"), true);
+                                                double balance = BalanceUtil.getBalance(player);
+                                                context.getSource().sendSuccess(new TranslatableComponent("commands.ecohelper.exchange.success", balance), true);
                                             } else {
-                                                context.getSource().sendFailure(Component.nullToEmpty("no"));
+                                                context.getSource().sendFailure(new TranslatableComponent("commands.ecohelper.exchange.fail"));
                                             }
 
                                             return 1;
@@ -133,9 +153,10 @@ public class EcoCommand {
                                             ServerPlayer player = context.getSource().getPlayerOrException();
                                             boolean result = BalanceUtil.exchangeToBalance(player);
                                             if (result) {
-                                                context.getSource().sendSuccess(Component.nullToEmpty("yes"), true);
+                                                double balance = BalanceUtil.getBalance(player);
+                                                context.getSource().sendSuccess(new TranslatableComponent("commands.ecohelper.exchange.success", balance), true);
                                             } else {
-                                                context.getSource().sendFailure(Component.nullToEmpty("no"));
+                                                context.getSource().sendFailure(new TranslatableComponent("commands.ecohelper.exchange.fail"));
                                             }
 
                                             return 1;
@@ -170,7 +191,7 @@ public class EcoCommand {
                                     if (worth == 0) {
                                         context.getSource().sendFailure(new TranslatableComponent("commands.ecohelper.worth.fail"));
                                     } else {
-                                        context.getSource().sendSuccess(new TranslatableComponent("commands.ecohelper.worth.success", itemOnHand.getHoverName(), worth), true);
+                                        context.getSource().sendSuccess(new TranslatableComponent("commands.ecohelper.worth.success", itemOnHand, worth), true);
                                     }
                                     return 1;
                                 })

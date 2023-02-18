@@ -126,4 +126,5 @@ public class TradableItemRecipe implements Recipe<Inventory> {
         }
         return null;
     }
+
 }
