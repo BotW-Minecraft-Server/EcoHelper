@@ -26,6 +26,9 @@ public class ItemWorthAfterTaxS2CPacket {
     public boolean handle(Supplier<NetworkEvent.Context> supplier) {
         NetworkEvent.Context context = supplier.get();
         context.enqueueWork(() -> {
+            // Motherfucker this bullshit:
+            // Old: TradableItemsTooltip.itemWorthAfterTaxFromServer = balance;
+            // It didn't work. Now let's try this:
             TradableItemsTooltip.itemWorthAfterTaxFromServer = balance;
         });
         return true;
