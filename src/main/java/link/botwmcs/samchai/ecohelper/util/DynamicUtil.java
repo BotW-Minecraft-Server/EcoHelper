@@ -16,21 +16,9 @@ public class DynamicUtil {
         return ((price) / Math.pow(Math.exp((property / basicProperty)), 0.5) + (price / (1 + property / basicProperty))) / 2;
     }
 
-    public static Item getBalanceUnitItem() {
-        try {
-            String itemName = EcoHelperConfig.CONFIG.default_balance_unit.get();
-            ResourceLocation itemRL = new ResourceLocation(itemName);
-            return ForgeRegistries.ITEMS.getValue(itemRL);
-        } catch (Throwable throwable) {
-            CrashReport crashreport = CrashReport.forThrowable(throwable, "Getting default balance unit item (Please check your config)");
-            CrashReportCategory crashreportcategory = crashreport.addCategory("Command to be executed");
-            crashreportcategory.setDetail("Item", EcoHelperConfig.CONFIG.default_balance_unit::get);
-            throw new ReportedException(crashreport);
-        }
-    }
-
     public static double getDynamicSellingPrice(double currentPrice, double playerBalance) {
-        return priceDownByProperty(currentPrice, playerBalance, EcoHelperConfig.CONFIG.dynamic_economic_basic_property.get());
+        double worth = priceDownByProperty(currentPrice, playerBalance, EcoHelperConfig.CONFIG.dynamic_economic_basic_property.get());
+        return BalanceUtil.roundDouble(worth);
     }
 
 }

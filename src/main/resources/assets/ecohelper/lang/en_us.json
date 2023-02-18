@@ -10,5 +10,7 @@
   "commands.ecohelper.pay.success": "You have paid %s to %s, now you have %s left.",
   "commands.ecohelper.pay.fail": "Pay failed, reason: %s",
   "commands.ecohelper.worth.success": "The worth of %s is %s",
-  "commands.ecohelper.worth.fail": "No worth set for this item."
+  "commands.ecohelper.worth.fail": "No worth set for this item.",
+  "commands.ecohelper.exchange.success": "The exchange successful, you now have: %s",
+  "commands.ecohelper.exchange.fail": "The exchange failed."
 }
