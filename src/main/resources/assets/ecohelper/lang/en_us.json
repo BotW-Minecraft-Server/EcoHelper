@@ -1,6 +1,7 @@
 {
   "commands.ecohelper.get": "Player %s's balance is: %s",
   "commands.ecohelper.get.myself": "Your balance is: %s",
+  "commands.ecohelper.get.total": "§eTotal balance: §r%s",
   "commands.ecohelper.set.success": "Player %s's balance has been modified to %s",
   "commands.ecohelper.set.fail": "Player %s's balance could not be modified, reason: %s",
   "commands.ecohelper.add.success": "Player %s's balance has been increased to %s",
