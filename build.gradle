@@ -139,15 +139,16 @@ repositories {
     // ForgeGradle automatically adds the Forge maven and Maven Central for you
 
     // If you have mod jar dependencies in ./libs, you can declare them as a repository like so:
-     flatDir {
-         dir 'libs'
-     }
+    flatDir {
+        dir 'libs'
+    }
 //    maven {
-//        url "https://www.jitpack.io"
+//        url 'https://jitpack.io'
 //    }
-//    maven {
-//        url "https://maven.nova-committee.cn/releases"
-//    }
+
+
+
+
 }
 
 dependencies {
@@ -171,6 +172,9 @@ dependencies {
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
     // implementation fg.deobf('com.github.Nova-Committee:LightEconomy:Forge-1.18.2-1.0.0')
     implementation fg.deobf("committee.nova:lighteco:1.0.0")
+//    implementation fg.deobf("net.cloudcake:craftcontrolrconforge:1.18.1-1.0.1")
+//    implementation group: 'org.glavo', name: 'rcon-java', version: '2.0.2'
+
 //    implementation fg.deobf(files('libs/lighteco-1.0.0.jar'))
 
 
