@@ -11,6 +11,7 @@ import link.botwmcs.samchai.ecohelper.util.BalanceUtil;
 import link.botwmcs.samchai.ecohelper.util.PlayerUtil;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
@@ -76,7 +77,7 @@ public class CommonProxy {
             if (EcoHelperConfig.CONFIG.default_balance.get() == 0) {
                 return;
             } else {
-                EcoUtils.EcoActionResult result = BalanceUtil.setBalance(event.getPlayer(), EcoHelperConfig.CONFIG.default_balance.get());
+                EcoUtils.EcoActionResult result = BalanceUtil.setBalance((ServerPlayer) event.getPlayer(), EcoHelperConfig.CONFIG.default_balance.get());
                 if (result != EcoUtils.EcoActionResult.SUCCESS) {
                     EcoHelper.LOGGER.warn("Failed to add first join default balance to player " + event.getPlayer().getName().getString() + ", reason: " + result);
                 } else {

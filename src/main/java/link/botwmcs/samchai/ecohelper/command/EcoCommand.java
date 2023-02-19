@@ -8,15 +8,18 @@ import com.mojang.brigadier.tree.LiteralCommandNode;
 import committee.nova.lighteco.util.EcoUtils;
 import link.botwmcs.samchai.ecohelper.config.EcoHelperConfig;
 import link.botwmcs.samchai.ecohelper.util.BalanceUtil;
+import link.botwmcs.samchai.ecohelper.util.DynamicUtil;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.Collection;
 import java.util.function.Predicate;
 
 public class EcoCommand {
@@ -55,12 +58,19 @@ public class EcoCommand {
                         .requires(configToggle)
                         .then(Commands.literal("admin")
                                 .requires(commandSourceStack -> commandSourceStack.hasPermission(4))
-                                .then(Commands.argument("target", EntityArgument.player())
+                                .then(Commands.argument("target", EntityArgument.players())
                                         .then(Commands.literal("get")
                                                 .executes(context -> {
-                                                    ServerPlayer player = EntityArgument.getPlayer(context, "target");
-                                                    double balance = BalanceUtil.getBalance(player);
-                                                    context.getSource().sendSuccess(new TranslatableComponent("commands.ecohelper.get", player.getName(), balance), true);
+                                                    Collection<ServerPlayer> players = EntityArgument.getPlayers(context, "target");
+                                                    for (ServerPlayer player : players) {
+                                                        if (players.size() == 1) {
+                                                            double balance = BalanceUtil.getBalance(player);
+                                                            context.getSource().sendSuccess(new TranslatableComponent("commands.ecohelper.get", player.getName(), balance), true);
+                                                            return 1;
+                                                        }
+                                                    }
+                                                    double allBalance = BalanceUtil.getAllBalance(context.getSource().getServer());
+                                                    context.getSource().sendSuccess(new TranslatableComponent("commands.ecohelper.get.total", allBalance), true);
                                                     return 1;
                                                 })
                                         )
@@ -191,7 +201,8 @@ public class EcoCommand {
                                     if (worth == 0) {
                                         context.getSource().sendFailure(new TranslatableComponent("commands.ecohelper.worth.fail"));
                                     } else {
-                                        context.getSource().sendSuccess(new TranslatableComponent("commands.ecohelper.worth.success", itemOnHand, worth), true);
+                                        double worthAfterTax = DynamicUtil.getDynamicSellingPrice(worth, player);
+                                        context.getSource().sendSuccess(new TranslatableComponent("commands.ecohelper.worth.success", itemOnHand, worthAfterTax), true);
                                     }
                                     return 1;
                                 })

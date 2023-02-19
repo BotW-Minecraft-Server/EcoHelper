@@ -31,8 +31,8 @@ public class ItemWorthAfterTaxC2SPacket {
         context.enqueueWork(() -> {
             // SERVER SIDE
             ServerPlayer player = context.getSender();
-            double balance = BalanceUtil.getBalance(player);
-            double afterTaxItemWorth = DynamicUtil.getDynamicSellingPrice(itemWorth, balance);
+//            double balance = BalanceUtil.getBalance(player);
+            double afterTaxItemWorth = DynamicUtil.getDynamicSellingPrice(itemWorth, player);
             ModNetwork.sendToPlayer(new ItemWorthAfterTaxS2CPacket(afterTaxItemWorth), player);
 
         });

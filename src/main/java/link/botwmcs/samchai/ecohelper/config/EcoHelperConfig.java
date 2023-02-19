@@ -30,6 +30,8 @@ public class EcoHelperConfig {
 
     public final ForgeConfigSpec.BooleanValue dynamic_economic;
     public final ForgeConfigSpec.ConfigValue<Double> dynamic_economic_basic_property;
+    public final ForgeConfigSpec.ConfigValue<Double> tax_baseline;
+    public final ForgeConfigSpec.BooleanValue global_statistics;
 
     public final ForgeConfigSpec.BooleanValue enable_sql;
     public final ForgeConfigSpec.ConfigValue<String> sql_type;
@@ -93,6 +95,12 @@ public class EcoHelperConfig {
         dynamic_economic_basic_property = builder
                 .comment("The average balance of single player in mathematical expectation")
                 .define("dynamic_economic_basic_property", 500000.0);
+        tax_baseline = builder
+                .comment("The baseline of tax (Although player's balance is 0, he still need to pay the baseline tax. Default 5%)")
+                .define("tax_baseline", 0.05);
+        global_statistics = builder
+                .comment("Global / Local statistics (Global statistics will calculate all players' balance, it may cause some inflation problem. Default false)")
+                .define("global_statistics", false);
         builder.pop();
 
         builder.push("sql_settings");

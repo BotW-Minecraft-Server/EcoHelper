@@ -5,6 +5,8 @@ import link.botwmcs.samchai.ecohelper.EcoHelper;
 import link.botwmcs.samchai.ecohelper.config.EcoHelperConfig;
 import link.botwmcs.samchai.ecohelper.recipe.TradableItemRecipe;
 import net.minecraft.client.Minecraft;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -24,30 +26,38 @@ public class BalanceUtil {
     public static final BiPredicate<Player, BigDecimal> RANGES = (p, v) ->
             v.compareTo(BigDecimal.valueOf(EcoHelperConfig.CONFIG.max_balance.get())) < 1 && v.compareTo(BigDecimal.valueOf(EcoHelperConfig.CONFIG.min_balance.get())) > -1;
 
-    public static double getBalance(Player player) {
+    public static double getBalance(ServerPlayer player) {
         Optional<BigDecimal> balance = EcoUtils.getBalance(player);
         return balance.map(BigDecimal::doubleValue).orElse(0.0);
     }
 
+    public static double getAllBalance(MinecraftServer server) {
+        AtomicReference<Double> balance = new AtomicReference<>(0.0);
+        server.getPlayerList().getPlayers().forEach(player -> {
+            balance.updateAndGet(v -> v + getBalance(player));
+        });
+        return balance.get();
+    }
 
-    public static EcoUtils.EcoActionResult addBalance(Player player, double value) {
+
+    public static EcoUtils.EcoActionResult addBalance(ServerPlayer player, double value) {
         value = roundDouble(value);
         return EcoUtils.vary(player, BigDecimal.valueOf(value), RANGES, (p, v) -> v, RANGES);
     }
 
-    public static EcoUtils.EcoActionResult removeBalance(Player player, double value) {
+    public static EcoUtils.EcoActionResult removeBalance(ServerPlayer player, double value) {
         value = roundDouble(value);
         return EcoUtils.vary(player, BigDecimal.valueOf(value), RANGES, (p, v) -> v.negate(), RANGES);
     }
 
-    public static EcoUtils.EcoActionResult setBalance(Player player, double value) {
+    public static EcoUtils.EcoActionResult setBalance(ServerPlayer player, double value) {
         value = roundDouble(value);
         EcoUtils.EcoActionResult result = removeBalance(player, getBalance(player));
         if (result != EcoUtils.EcoActionResult.SUCCESS) return result;
         return addBalance(player, value);
     }
 
-    public static EcoUtils.EcoActionResult transferBalance(Player from, Player to, double value) {
+    public static EcoUtils.EcoActionResult transferBalance(ServerPlayer from, ServerPlayer to, double value) {
         value = roundDouble(value);
         EcoUtils.EcoActionResult result = removeBalance(from, value);
         if (result != EcoUtils.EcoActionResult.SUCCESS) return result;
@@ -55,7 +65,7 @@ public class BalanceUtil {
     }
 
     // Basic by https://gist.github.com/Sam-Chai/70efee8f15d171b358bb1ae2a444cbd9
-    public static boolean exchangeToBalance(Player player, int count) {
+    public static boolean exchangeToBalance(ServerPlayer player, int count) {
         Inventory inventory = player.getInventory();
         AtomicReference<EcoUtils.EcoActionResult> result = new AtomicReference<>(EcoUtils.EcoActionResult.SUCCESS);
         int remove = ContainerHelper.clearOrCountMatchingItems(inventory, itemStack -> {
@@ -69,7 +79,8 @@ public class BalanceUtil {
                 TradableItemRecipe recipe = TradableItemRecipe.getRecipeFromItem(level, itemStack);
                 if (recipe != null) {
                     double worth = recipe.getWorth() * count;
-                    result.set(addBalance(player, worth));
+                    double worthAfterTax = DynamicUtil.getDynamicSellingPrice(worth, player);
+                    result.set(addBalance(player, worthAfterTax));
                     if (result.get() != EcoUtils.EcoActionResult.SUCCESS) {
                         inventory.add(itemStack);
                         return false;
@@ -86,7 +97,7 @@ public class BalanceUtil {
         return result.get() == EcoUtils.EcoActionResult.SUCCESS;
     }
 
-    public static boolean exchangeToBalance(Player player) {
+    public static boolean exchangeToBalance(ServerPlayer player) {
         Inventory inventory = player.getInventory();
         int total = 0;
         for (int i = 0; i < inventory.getContainerSize(); i++) {
