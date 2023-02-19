@@ -46,7 +46,7 @@ public class TradableItemsTooltip {
             int worthFontWidth = minecraft.font.width(String.valueOf(worth));
             int worthAfterTaxFontWidth = minecraft.font.width(String.valueOf(itemWorthAfterTaxFromServer));
             int width = worthFontWidth + worthAfterTaxFontWidth + 20;
-            EcoHelper.LOGGER.info(String.valueOf(width));
+//            EcoHelper.LOGGER.info(String.valueOf(width));
             if (worth != 0) {
                 event.getTooltipElements().add(x, Either.right(new WorthComponent(itemStack, width, 10)));
             }
