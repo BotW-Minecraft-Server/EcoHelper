@@ -1,0 +1,7 @@
+{
+  "type": "ecohelper:tradable_item",
+  "ingredient": {
+    "item": "minecraft:emerald_block"
+  },
+  "worth": 90
+}
