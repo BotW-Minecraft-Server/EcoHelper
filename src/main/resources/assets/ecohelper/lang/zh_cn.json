@@ -1,0 +1,17 @@
+{
+  "commands.ecohelper.get": "玩家 %s 的余额为: %s",
+  "commands.ecohelper.get.myself": "你的余额为: %s",
+  "commands.ecohelper.get.total": "§e全服总计余额: §r%s",
+  "commands.ecohelper.set.success": "玩家 %s 的余额数量已被修改至: %s",
+  "commands.ecohelper.set.fail": "玩家 %s 的余额无法修改, 原因: %s",
+  "commands.ecohelper.add.success": "玩家 %s 的余额数量已增加 %s",
+  "commands.ecohelper.add.fail": "玩家 %s 的余额无法添加, 原因: %s",
+  "commands.ecohelper.remove.success": "玩家 %s 的余额已被减少 %s",
+  "commands.ecohelper.remove.fail": "玩家 %s 的余额无法减少, 原因: %s",
+  "commands.ecohelper.pay.success": "你向 %s 发起了转账 %s, 现在你有 %s",
+  "commands.ecohelper.pay.fail": "转账失败, 原因: %s",
+  "commands.ecohelper.worth.success": "%s 的价值为: %s",
+  "commands.ecohelper.worth.fail": "该物品没有价值属性",
+  "commands.ecohelper.exchange.success": "物品兑换成功, 现在你有: %s",
+  "commands.ecohelper.exchange.fail": "物品兑换失败"
+}
