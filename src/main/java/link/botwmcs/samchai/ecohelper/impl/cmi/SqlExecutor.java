@@ -37,7 +37,7 @@ public class SqlExecutor {
             Connection connection = SqlExecutor.connect();
             Statement statement = connection.createStatement();
             ResultSet resultSet = statement.executeQuery(selectTarget);
-            EcoHelper.LOGGER.info("Player: " + resultSet.getString("username") + " Balance: " + resultSet.getDouble("Balance"));
+//            EcoHelper.LOGGER.info("Player: " + resultSet.getString("username") + " Balance: " + resultSet.getDouble("Balance"));
             CmiToEcoHelper.setPlayerBalance(player, resultSet.getDouble("Balance"));
             resultSet.close();
         } catch (SQLException throwables) {

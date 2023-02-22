@@ -6,6 +6,7 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import committee.nova.lighteco.util.EcoUtils;
+import link.botwmcs.samchai.ecohelper.EcoHelper;
 import link.botwmcs.samchai.ecohelper.config.EcoHelperConfig;
 import link.botwmcs.samchai.ecohelper.impl.BukkitImpl;
 import link.botwmcs.samchai.ecohelper.impl.cmi.SqlExecutor;
@@ -20,6 +21,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.function.Predicate;
 
 
@@ -46,6 +48,14 @@ public class EcoCommand {
         // Check if config GUI is enabled
         Predicate<CommandSourceStack> configToggleGUI = commandSourceStack -> {
             if (EcoHelperConfig.CONFIG.enable_gui.get()) {
+                return true;
+            } else {
+                return false;
+            }
+        };
+        // Check if config sync is enabled
+        Predicate<CommandSourceStack> configToggleSync = commandSourceStack -> {
+            if (!Objects.equals(EcoHelperConfig.CONFIG.bukkit_economy_system.get(), "false")) {
                 return true;
             } else {
                 return false;
@@ -208,11 +218,23 @@ public class EcoCommand {
                                     return 1;
                                 })
                         )
-                        .then(Commands.literal("sql")
+                        .then(Commands.literal("sync")
+                                .requires(configToggleSync)
                                 .then(Commands.argument("target", EntityArgument.player())
                                         .executes(context -> {
                                             ServerPlayer serverPlayer = EntityArgument.getPlayer(context, "target");
-                                            BukkitImpl.setEssBalanceToEH(serverPlayer);
+                                            if (Objects.equals(EcoHelperConfig.CONFIG.bukkit_economy_system.get(), "CMI")) {
+                                                // CMI sync
+                                                EcoHelper.LOGGER.info("Syncing CMI balance to player " + serverPlayer);
+                                                BukkitImpl.setCmiBalanceToEH(Objects.requireNonNull(serverPlayer));
+                                            } else if (Objects.equals(EcoHelperConfig.CONFIG.bukkit_economy_system.get(), "Essentials")) {
+                                                // Essentials sync
+                                                EcoHelper.LOGGER.info("Syncing Essentials balance to player " + serverPlayer);
+                                                BukkitImpl.setEssBalanceToEH(Objects.requireNonNull(serverPlayer));
+                                            } else {
+                                                EcoHelper.LOGGER.warn("Unknown Bukkit economy system " + EcoHelperConfig.CONFIG.bukkit_economy_system.get() + ", did not sync balance");
+                                            }
+
                                             return 1;
                                         })
                                 )
