@@ -4,6 +4,8 @@ import committee.nova.lighteco.util.EcoUtils;
 import link.botwmcs.samchai.ecohelper.EcoHelper;
 import link.botwmcs.samchai.ecohelper.command.EcoCommand;
 import link.botwmcs.samchai.ecohelper.config.EcoHelperConfig;
+import link.botwmcs.samchai.ecohelper.impl.BukkitImpl;
+import link.botwmcs.samchai.ecohelper.impl.cmi.SqlExecutor;
 import link.botwmcs.samchai.ecohelper.network.ModNetwork;
 import link.botwmcs.samchai.ecohelper.recipe.ModRecipes;
 import link.botwmcs.samchai.ecohelper.recipe.TradableItemRecipe;
@@ -15,6 +17,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -29,7 +33,8 @@ import java.util.Objects;
 @Mod.EventBusSubscriber(modid = EcoHelper.MODID)
 public class CommonProxy {
 
-    public CommonProxy() {}
+    public CommonProxy() {
+    }
 
     public void start() {
         EcoHelper.LOGGER.info("CommonProxy start");
@@ -40,7 +45,8 @@ public class CommonProxy {
         ModNetwork.register();
     }
 
-    public void registerListeners(IEventBus bus) {}
+    public void registerListeners(IEventBus bus) {
+    }
 
     @SubscribeEvent
     public static void registerCommand(RegisterCommandsEvent event) {
@@ -54,6 +60,7 @@ public class CommonProxy {
 
     @SubscribeEvent
     public static void onPlayerJoinedServer(PlayerEvent.PlayerLoggedInEvent event) {
+        // Check config
         String item = EcoHelperConfig.CONFIG.default_balance_unit.get();
         if (!Objects.equals(item, "minecraft:air")) {
             ResourceLocation itemRL = new ResourceLocation(item);
@@ -73,6 +80,8 @@ public class CommonProxy {
             EcoHelper.LOGGER.info("Default balance unit set to air, did not enable item worth system");
             EcoHelper.ITEM_EXCHANGE_SWITCH = false;
         }
+
+        // First given balance
         if (PlayerUtil.isJoiningWorldForTheFirstTime(event.getPlayer())) {
             if (EcoHelperConfig.CONFIG.default_balance.get() == 0) {
                 return;
@@ -83,6 +92,25 @@ public class CommonProxy {
                 } else {
                     EcoHelper.LOGGER.info("Added first join default balance to player " + event.getPlayer().getName().getString());
                 }
+            }
+        }
+    }
+
+    @OnlyIn(Dist.DEDICATED_SERVER)
+    @SubscribeEvent
+    public static void onPlayerJoined(PlayerEvent.PlayerLoggedInEvent event) {
+        // Sync system
+        if (!Objects.equals(EcoHelperConfig.CONFIG.bukkit_economy_system.get(), "false")) {
+            if (Objects.equals(EcoHelperConfig.CONFIG.bukkit_economy_system.get(), "CMI")) {
+                // CMI sync
+                EcoHelper.LOGGER.info("Syncing CMI balance to player " + event.getPlayer());
+                BukkitImpl.setCmiBalanceToEH(Objects.requireNonNull(event.getPlayer().getServer().getPlayerList().getPlayer(event.getPlayer().getUUID())));
+            } else if (Objects.equals(EcoHelperConfig.CONFIG.bukkit_economy_system.get(), "Essentials")) {
+                // Essentials sync
+                EcoHelper.LOGGER.info("Syncing Essentials balance to player " + event.getPlayer());
+                BukkitImpl.setEssBalanceToEH(Objects.requireNonNull(event.getPlayer().getServer().getPlayerList().getPlayer(event.getPlayer().getUUID())));
+            } else {
+                EcoHelper.LOGGER.warn("Unknown Bukkit economy system " + EcoHelperConfig.CONFIG.bukkit_economy_system.get() + ", did not sync balance");
             }
         }
     }

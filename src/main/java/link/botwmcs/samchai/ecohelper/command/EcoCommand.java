@@ -7,6 +7,8 @@ import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.brigadier.tree.LiteralCommandNode;
 import committee.nova.lighteco.util.EcoUtils;
 import link.botwmcs.samchai.ecohelper.config.EcoHelperConfig;
+import link.botwmcs.samchai.ecohelper.impl.BukkitImpl;
+import link.botwmcs.samchai.ecohelper.impl.cmi.SqlExecutor;
 import link.botwmcs.samchai.ecohelper.util.BalanceUtil;
 import link.botwmcs.samchai.ecohelper.util.DynamicUtil;
 import net.minecraft.commands.CommandSourceStack;
@@ -19,6 +21,7 @@ import net.minecraft.world.item.ItemStack;
 
 import java.util.Collection;
 import java.util.function.Predicate;
+
 
 public class EcoCommand {
 
@@ -204,6 +207,15 @@ public class EcoCommand {
                                     }
                                     return 1;
                                 })
+                        )
+                        .then(Commands.literal("sql")
+                                .then(Commands.argument("target", EntityArgument.player())
+                                        .executes(context -> {
+                                            ServerPlayer serverPlayer = EntityArgument.getPlayer(context, "target");
+                                            BukkitImpl.setEssBalanceToEH(serverPlayer);
+                                            return 1;
+                                        })
+                                )
                         )
                         .then(Commands.literal("wallet")
                                 .requires(configToggleGUI)

@@ -12,6 +12,7 @@ buildscript {
 plugins {
     id 'net.minecraftforge.gradle' version '5.1.+'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
 }
 
 apply plugin: 'org.spongepowered.mixin'
@@ -23,6 +24,8 @@ java {
     archivesBaseName = 'ecohelper'
     toolchain.languageVersion = JavaLanguageVersion.of(17)
 }
+
+jarJar.enable()
 
 minecraft {
     // The mappings can be changed at any time and must be in the following format.
@@ -142,12 +145,6 @@ repositories {
     flatDir {
         dir 'libs'
     }
-//    maven {
-//        url 'https://jitpack.io'
-//    }
-
-
-
 
 }
 
@@ -170,18 +167,15 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
-    // implementation fg.deobf('com.github.Nova-Committee:LightEconomy:Forge-1.18.2-1.0.0')
     implementation fg.deobf("committee.nova:lighteco:1.0.0")
-//    implementation fg.deobf("net.cloudcake:craftcontrolrconforge:1.18.1-1.0.1")
-//    implementation group: 'org.glavo', name: 'rcon-java', version: '2.0.2'
-
-//    implementation fg.deobf(files('libs/lighteco-1.0.0.jar'))
-
+    implementation group: 'org.yaml', name: 'snakeyaml', version: '1.33'
+    jarJar(group: 'org.yaml', name: 'snakeyaml', version: '[1.33,)')
 
 }
 
 // Example for how to get properties into the manifest for reading at runtime.
 jar {
+
     manifest {
         attributes([
                 "Specification-Title"     : "ecohelper",
@@ -195,7 +189,48 @@ jar {
     }
 }
 
+// One operation is as fierce as a tiger, one operation is as gentle as a lamb.
+// Dont use this, the YAML lib already have on springboot
+// Use normal Tasks -> build -> jar.
+tasks.jarJar.configure {
+    classifier ''
+}
+
+reobf {
+    jarJar {}
+}
+tasks.jarJar.finalizedBy('reobfJarJar')
+
 jar.finalizedBy('reobfJar')
+
+shadowJar {
+    dependencies {
+        include (dependency('org.yaml:snakeyaml:1.33'))
+    }
+    relocate 'org.yaml', 'link.botwmcs.samchai.ecohelper.org.yaml'
+    classifier = ''
+}
+reobf {
+    shadowJar {}
+}
+
+//shadowJar {
+//    dependencies {
+//        include (dependency(group: 'org.yaml', name: 'snakeyaml', version: '1.25'))
+//    }
+//    manifest {
+//        attributes([
+//                "Specification-Title"     : "ecohelper",
+//                "Specification-Vendor"    : "Sam_Chai",
+//                "Specification-Version"   : "1", // We are version 1 of ourselves
+//                "Implementation-Title"    : project.name,
+//                "Implementation-Version"  : project.jar.archiveVersion,
+//                "Implementation-Vendor"   : "Sam_Chai",
+//                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+//        ])
+//    }
+//}
+//shadowJar.finalizedBy('reobfJar')
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation

@@ -35,11 +35,6 @@ public class EcoHelperConfig {
 
     public final ForgeConfigSpec.ConfigValue<String> economy_sync_mode;
     public final ForgeConfigSpec.ConfigValue<String> bukkit_economy_system;
-    public final ForgeConfigSpec.ConfigValue<String> get_bukkit_economy_command;
-    public final ForgeConfigSpec.ConfigValue<String> set_bukkit_economy_command;
-    public final ForgeConfigSpec.ConfigValue<String> server_rcon_host;
-    public final ForgeConfigSpec.ConfigValue<Integer> server_rcon_port;
-    public final ForgeConfigSpec.ConfigValue<String> server_rcon_password;
 
 
     static {
@@ -113,23 +108,8 @@ public class EcoHelperConfig {
                 .comment("Economy sync mode (initiative, passive, set false to disable sync)")
                 .define("economy_mode", "false");
         bukkit_economy_system = builder
-                .comment("Bukkit economy system (If economy_mode is passive): Essentials, CMI, Vault")
-                .define("bukkit_economy_system", "Vault");
-        get_bukkit_economy_command = builder
-                .comment("Get bukkit economy command (If economy_mode is passive, %s is player name)")
-                .define("get_bukkit_economy_command", "/papi parse %s %vault_eco_balance%");
-        set_bukkit_economy_command = builder
-                .comment("Set bukkit economy command (If economy_mode is passive, 1st %s is player name, 2nd %s is balance)")
-                .define("set_bukkit_economy_command", "/cmi money %s %s");
-        server_rcon_host = builder
-                .comment("Server rcon host (Default: localhost)")
-                .define("server_rcon_host", "localhost");
-        server_rcon_port = builder
-                .comment("Server rcon port (Default: 25575)")
-                .define("server_rcon_port", 25575);
-        server_rcon_password = builder
-                .comment("Server rcon password (Default: password)")
-                .define("server_rcon_password", "password");
+                .comment("Bukkit economy system (If economy_mode is passive): Essentials, CMI")
+                .define("bukkit_economy_system", "CMI");
         builder.pop();
 
 
