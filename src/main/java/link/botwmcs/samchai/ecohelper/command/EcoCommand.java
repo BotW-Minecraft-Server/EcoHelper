@@ -9,7 +9,6 @@ import committee.nova.lighteco.util.EcoUtils;
 import link.botwmcs.samchai.ecohelper.EcoHelper;
 import link.botwmcs.samchai.ecohelper.config.EcoHelperConfig;
 import link.botwmcs.samchai.ecohelper.impl.BukkitImpl;
-import link.botwmcs.samchai.ecohelper.impl.cmi.SqlExecutor;
 import link.botwmcs.samchai.ecohelper.util.BalanceUtil;
 import link.botwmcs.samchai.ecohelper.util.DynamicUtil;
 import net.minecraft.commands.CommandSourceStack;
@@ -36,6 +35,10 @@ public class EcoCommand {
             } catch (CommandSyntaxException e) {
                 return false;
             }
+        };
+        // Check if is server
+        Predicate<CommandSourceStack> isServer = commandSourceStack -> {
+            return commandSourceStack.getServer().isDedicatedServer();
         };
         // Check if config is enabled
         Predicate<CommandSourceStack> configToggle = commandSourceStack -> {
@@ -131,25 +134,29 @@ public class EcoCommand {
                                                         })
                                                 )
                                         )
-                                        .then(Commands.literal("tax")
-                                                .then(Commands.literal("get")
-                                                        .executes(context -> {
-                                                            return 1;
-                                                        })
-                                                )
-                                                .then(Commands.literal("set")
-                                                        .executes(context -> {
-                                                            return 1;
-                                                        })
-                                                )
-                                                .then(Commands.literal("receiver")
-                                                        .then(Commands.argument("receiver", EntityArgument.player())
-                                                                .executes(context -> {
-                                                                    return 1;
-                                                                })
-                                                        )
-                                                )
-                                        )
+                                )
+                        )
+                        .then(Commands.literal("sync")
+                                .requires(configToggleSync)
+                                .requires(commandSourceStack -> commandSourceStack.hasPermission(4))
+                                .requires(isServer)
+                                .then(Commands.argument("target", EntityArgument.player())
+                                        .executes(context -> {
+                                            ServerPlayer serverPlayer = EntityArgument.getPlayer(context, "target");
+                                            if (Objects.equals(EcoHelperConfig.CONFIG.bukkit_economy_system.get(), "CMI")) {
+                                                // CMI sync
+                                                EcoHelper.LOGGER.info("Syncing CMI balance to player " + serverPlayer);
+                                                BukkitImpl.setCmiBalanceToEH(Objects.requireNonNull(serverPlayer));
+                                            } else if (Objects.equals(EcoHelperConfig.CONFIG.bukkit_economy_system.get(), "Essentials")) {
+                                                // Essentials sync
+                                                EcoHelper.LOGGER.info("Syncing Essentials balance to player " + serverPlayer);
+                                                BukkitImpl.setEssBalanceToEH(Objects.requireNonNull(serverPlayer));
+                                            } else {
+                                                EcoHelper.LOGGER.warn("Unknown Bukkit economy system " + EcoHelperConfig.CONFIG.bukkit_economy_system.get() + ", did not sync balance");
+                                            }
+
+                                            return 1;
+                                        })
                                 )
                         )
                         .then(Commands.literal("exchange")
@@ -217,27 +224,6 @@ public class EcoCommand {
                                     }
                                     return 1;
                                 })
-                        )
-                        .then(Commands.literal("sync")
-                                .requires(configToggleSync)
-                                .then(Commands.argument("target", EntityArgument.player())
-                                        .executes(context -> {
-                                            ServerPlayer serverPlayer = EntityArgument.getPlayer(context, "target");
-                                            if (Objects.equals(EcoHelperConfig.CONFIG.bukkit_economy_system.get(), "CMI")) {
-                                                // CMI sync
-                                                EcoHelper.LOGGER.info("Syncing CMI balance to player " + serverPlayer);
-                                                BukkitImpl.setCmiBalanceToEH(Objects.requireNonNull(serverPlayer));
-                                            } else if (Objects.equals(EcoHelperConfig.CONFIG.bukkit_economy_system.get(), "Essentials")) {
-                                                // Essentials sync
-                                                EcoHelper.LOGGER.info("Syncing Essentials balance to player " + serverPlayer);
-                                                BukkitImpl.setEssBalanceToEH(Objects.requireNonNull(serverPlayer));
-                                            } else {
-                                                EcoHelper.LOGGER.warn("Unknown Bukkit economy system " + EcoHelperConfig.CONFIG.bukkit_economy_system.get() + ", did not sync balance");
-                                            }
-
-                                            return 1;
-                                        })
-                                )
                         )
                         .then(Commands.literal("wallet")
                                 .requires(configToggleGUI)
